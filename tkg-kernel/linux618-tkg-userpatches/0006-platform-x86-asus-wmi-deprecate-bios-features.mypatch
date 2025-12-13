@@ -1,7 +1,10 @@
-From b1641c2834f5499a1dfa640b4e4ccb10349c11d7 Mon Sep 17 00:00:00 2001
+From c683651b6791e85c2f892f8009268f1525f71408 Mon Sep 17 00:00:00 2001
 From: "Luke D. Jones" <luke@ljones.dev>
-Date: Wed, 15 Oct 2025 03:47:34 +0200
-Subject: [PATCH v15 7/9] platform/x86: asus-wmi: deprecate bios features
+Date: Sun, 2 Nov 2025 22:53:17 +0100
+Subject: [PATCH 18/24] platform/x86: asus-wmi: deprecate bios features
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 With the existence of the asus-armoury module the attributes no longer
 need to live under the /sys/devices/platform/asus-nb-wmi/ path.
@@ -9,10 +12,12 @@ need to live under the /sys/devices/platform/asus-nb-wmi/ path.
 Deprecate all those that were implemented in asus-bioscfg with the goal
 of removing them fully in the next LTS cycle.
 
-Signed-off-by: Denis Benato <benato.denis96@gmail.com>
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
 Signed-off-by: Luke D. Jones <luke@ljones.dev>
 Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
-Tested-by: Denis Benato <benato.denis96@gmail.com>
+Link: https://patch.msgid.link/20251102215319.3126879-8-denis.benato@linux.dev
+Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
  .../ABI/testing/sysfs-platform-asus-wmi       |  17 +++
  drivers/platform/x86/Kconfig                  |  11 ++
@@ -160,10 +165,10 @@ index 28144371a0f1..89acb6638df8 100644
  			* 0 - False,
  			* 1 - True
 diff --git a/drivers/platform/x86/Kconfig b/drivers/platform/x86/Kconfig
-index 8b827680754c..a17288401746 100644
+index ba0806b48bb9..0a8025a16778 100644
 --- a/drivers/platform/x86/Kconfig
 +++ b/drivers/platform/x86/Kconfig
-@@ -296,6 +296,17 @@ config ASUS_WMI
+@@ -298,6 +298,17 @@ config ASUS_WMI
  	  To compile this driver as a module, choose M here: the module will
  	  be called asus-wmi.
  
@@ -588,5 +593,5 @@ index ff98267e5981..6de633d4a748 100644
  	if (err)
  		goto fail_fan_boost_mode;
 -- 
-2.51.0
+2.51.2
 

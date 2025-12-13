@@ -1,8 +1,11 @@
-From 48c61cfa5f583b9be30cbfd9a83648582997c007 Mon Sep 17 00:00:00 2001
+From 22ea7b9d96e26147b7a3ea1be7aa106cc700907c Mon Sep 17 00:00:00 2001
 From: "Luke D. Jones" <luke@ljones.dev>
-Date: Sun, 15 Jun 2025 22:14:56 +0200
-Subject: [PATCH v15 1/9] platform/x86: asus-wmi: export symbols used for
+Date: Sun, 2 Nov 2025 22:53:11 +0100
+Subject: [PATCH 13/24] platform/x86: asus-wmi: export symbols used for
  read/write WMI
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Export symbols for reading/writing WMI symbols using a namespace.
 Existing functions:
@@ -14,10 +17,13 @@ New function:
 The new function is intended for use with DSTS WMI method only and
 avoids requiring the asus_wmi driver data to select the WMI method.
 
-Co-developed-by: Denis Benato <benato.denis96@gmail.com>
-Signed-off-by: Denis Benato <benato.denis96@gmail.com>
+Co-developed-by: Denis Benato <denis.benato@linux.dev>
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
 Signed-off-by: Luke D. Jones <luke@ljones.dev>
 Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
+Link: https://patch.msgid.link/20251102215319.3126879-2-denis.benato@linux.dev
+Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
  drivers/platform/x86/asus-wmi.c            | 46 ++++++++++++++++++++--
  include/linux/platform_data/x86/asus-wmi.h |  5 +++
@@ -115,5 +121,5 @@ index 8a515179113d..dbd44d9fbb6f 100644
  					   u32 *retval)
  {
 -- 
-2.51.0
+2.51.2
 

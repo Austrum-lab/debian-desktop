@@ -1,8 +1,7 @@
-From f755d16bcf0536a06ab954c655150ea56edb90d0 Mon Sep 17 00:00:00 2001
+From 628cb03b15f2a0f10534979b3ea9c8befe87c381 Mon Sep 17 00:00:00 2001
 From: "Luke D. Jones" <luke@ljones.dev>
-Date: Wed, 19 Mar 2025 19:58:22 +1300
-Subject: [PATCH v15 3/9] platform/x86: asus-armoury: add panel_hd_mode
- attribute
+Date: Sun, 2 Nov 2025 22:53:13 +0100
+Subject: [PATCH 15/24] platform/x86: asus-armoury: add panel_hd_mode attribute
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -10,20 +9,22 @@ Content-Transfer-Encoding: 8bit
 Add panel_hd_mode to toggle the panel mode between single and high
 definition modes.
 
-Signed-off-by: Denis Benato <benato.denis96@gmail.com>
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
 Signed-off-by: Luke D. Jones <luke@ljones.dev>
 Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
 Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Link: https://patch.msgid.link/20251102215319.3126879-4-denis.benato@linux.dev
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
  drivers/platform/x86/asus-armoury.c        | 6 +++++-
  include/linux/platform_data/x86/asus-wmi.h | 1 +
  2 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/platform/x86/asus-armoury.c b/drivers/platform/x86/asus-armoury.c
-index 381b7832496e..1723c7d898c1 100644
+index 81b4972df818..f0cb973a487e 100644
 --- a/drivers/platform/x86/asus-armoury.c
 +++ b/drivers/platform/x86/asus-armoury.c
-@@ -101,7 +101,8 @@ static struct kobj_attribute pending_reboot = __ATTR_RO(pending_reboot);
+@@ -96,7 +96,8 @@ static struct kobj_attribute pending_reboot = __ATTR_RO(pending_reboot);
  
  static bool asus_bios_requires_reboot(struct kobj_attribute *attr)
  {
@@ -33,7 +34,7 @@ index 381b7832496e..1723c7d898c1 100644
  }
  
  /**
-@@ -625,6 +626,8 @@ ASUS_ATTR_GROUP_BOOL_RW(mcu_powersave, "mcu_powersave", ASUS_WMI_DEVID_MCU_POWER
+@@ -607,6 +608,8 @@ ASUS_ATTR_GROUP_BOOL_RW(mcu_powersave, "mcu_powersave", ASUS_WMI_DEVID_MCU_POWER
  			"Set MCU powersaving mode");
  ASUS_ATTR_GROUP_BOOL_RW(panel_od, "panel_overdrive", ASUS_WMI_DEVID_PANEL_OD,
  			"Set the panel refresh overdrive");
@@ -42,7 +43,7 @@ index 381b7832496e..1723c7d898c1 100644
  ASUS_ATTR_GROUP_BOOL_RO(egpu_connected, "egpu_connected", ASUS_WMI_DEVID_EGPU_CONNECTED,
  			"Show the eGPU connection status");
  
-@@ -638,6 +641,7 @@ static const struct asus_attr_group armoury_attr_groups[] = {
+@@ -620,6 +623,7 @@ static const struct asus_attr_group armoury_attr_groups[] = {
  	{ &boot_sound_attr_group, ASUS_WMI_DEVID_BOOT_SOUND },
  	{ &mcu_powersave_attr_group, ASUS_WMI_DEVID_MCU_POWERSAVE },
  	{ &panel_od_attr_group, ASUS_WMI_DEVID_PANEL_OD },
@@ -51,10 +52,10 @@ index 381b7832496e..1723c7d898c1 100644
  
  static int asus_fw_attr_add(void)
 diff --git a/include/linux/platform_data/x86/asus-wmi.h b/include/linux/platform_data/x86/asus-wmi.h
-index 71c68425b3b9..10acd5d52e38 100644
+index 8ea8925a0fc5..3cc235b20be4 100644
 --- a/include/linux/platform_data/x86/asus-wmi.h
 +++ b/include/linux/platform_data/x86/asus-wmi.h
-@@ -76,6 +76,7 @@
+@@ -75,6 +75,7 @@
  #define ASUS_WMI_DEVID_THROTTLE_THERMAL_POLICY_VIVO 0x00110019
  
  /* Misc */
@@ -63,5 +64,5 @@ index 71c68425b3b9..10acd5d52e38 100644
  #define ASUS_WMI_DEVID_CAMERA		0x00060013
  #define ASUS_WMI_DEVID_LID_FLIP		0x00060062
 -- 
-2.51.0
+2.51.2
 
