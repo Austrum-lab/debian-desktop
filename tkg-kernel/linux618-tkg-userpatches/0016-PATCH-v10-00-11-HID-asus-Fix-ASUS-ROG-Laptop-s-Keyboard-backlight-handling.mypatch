@@ -636,19 +636,8 @@ index 5fc0c7dd6eda..8a15e54b3c8a 100644
 +
  	return value;
  }
- 
-@@ -1843,7 +2002,9 @@ static int camera_led_set(struct led_classdev *led_cdev,
- 
- static void asus_wmi_led_exit(struct asus_wmi *asus)
- {
--	led_classdev_unregister(&asus->kbd_led);
-+	scoped_guard(spinlock_irqsave, &asus_ref.lock)
-+		asus_ref.asus = NULL;
-+
- 	led_classdev_unregister(&asus->tpd_led);
- 	led_classdev_unregister(&asus->wlan_led);
- 	led_classdev_unregister(&asus->lightbar_led);
-@@ -1881,22 +2042,26 @@ static int asus_wmi_led_init(struct asus_wmi *asus)
+
+@@ -2042,22 +2203,26 @@ static int asus_wmi_led_init(struct asus_wmi *asus)
  			goto error;
  	}
  
@@ -657,21 +646,23 @@ index 5fc0c7dd6eda..8a15e54b3c8a 100644
 -		asus->kbd_led_wk = led_val;
 -		asus->kbd_led.name = "asus::kbd_backlight";
 -		asus->kbd_led.flags = LED_BRIGHT_HW_CHANGED;
--		asus->kbd_led.brightness_set = kbd_led_set;
+-		asus->kbd_led.brightness_set_blocking = kbd_led_set;
 -		asus->kbd_led.brightness_get = kbd_led_get;
 -		asus->kbd_led.max_brightness = 3;
 +	asus->kbd_led.name = "asus::kbd_backlight";
 +	asus->kbd_led.flags = LED_BRIGHT_HW_CHANGED;
-+	asus->kbd_led.brightness_set = kbd_led_set;
++	asus->kbd_led.brightness_set_blocking = kbd_led_set;
 +	asus->kbd_led.brightness_get = kbd_led_get;
 +	asus->kbd_led.max_brightness = ASUS_EV_MAX_BRIGHTNESS;
 +	asus->kbd_led_avail = !kbd_led_read(asus, &led_val, NULL);
 +	INIT_WORK(&asus->kbd_led_work, kbd_led_update_all);
  
+-		if (num_rgb_groups != 0)
+-			asus->kbd_led.groups = kbd_rgb_mode_groups;
 +	if (asus->kbd_led_avail) {
 +		asus->kbd_led_wk = led_val;
- 		if (num_rgb_groups != 0)
- 			asus->kbd_led.groups = kbd_rgb_mode_groups;
++		if (num_rgb_groups != 0)
++			asus->kbd_led.groups = kbd_rgb_mode_groups;
 +	} else {
 +		asus->kbd_led_wk = -1;
 +	}
