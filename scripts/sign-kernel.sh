@@ -3,7 +3,7 @@
 MOK_FOLDER=/opt/_src
 MOK_NAME=MOK
 KERNEL_VERSION=$(uname -r)
-#KERNEL_VERSION=6.18.7-tkg-bore
+#KERNEL_VERSION=6.18.10-tkg-bore
 
 SIGN_TOOL="/usr/src/linux-headers-${KERNEL_VERSION}/scripts/sign-file"
 
