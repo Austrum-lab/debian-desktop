@@ -1,4 +1,5 @@
 # gnome-extensions list --enabled
+
 blur-my-shell@aunetx
 dash-to-dock@micxgx.gmail.com
 fullscreen-avoider@noobsai.github.com
@@ -7,6 +8,10 @@ gpu-switcher-supergfxctl@chikobara.github.io
 quick-lang-switch@ankostis.gmail.com
 appindicatorsupport@rgcjonas.gmail.com
 guillotine@fopdoodle.net
-drive-menu@gnome-shell-extensions.gcampax.github.com
-user-theme@gnome-shell-extensions.gcampax.github.com
 workspace-indicator@gnome-shell-extensions.gcampax.github.com
+user-theme@gnome-shell-extensions.gcampax.github.com
+drive-menu@gnome-shell-extensions.gcampax.github.com
+multi-monitors-add-on@spin83
+copyous@boerdereinar.dev
+draw-on-gnome@daveprowse.github.io
+pointer-tracker@garz.dev

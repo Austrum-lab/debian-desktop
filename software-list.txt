@@ -42,5 +42,6 @@ Games stuff
 
 Kernels and firmware:
 - TKG Kernel - it's just good https://github.com/Frogging-Family/linux-tkg
+- linux-g14 - patches and addons for asus laptops https://gitlab.com/asus-linux/linux-g14/
 - Firmware repo - just fresh firmware from main repo. Not a software but https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
 
