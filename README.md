@@ -11,7 +11,7 @@ Repo contains some files, scripts and configs and info about using debian testin
 | `scripts/` | Some scripts |
 | `etc/` | System configs (apt, modprobe, sysctl, environment) |
 | `tkg-kernel/` | TKG kernel configs and patches |
-| `easyeffect-presets/` | EasyEffects audio presets |
+| `easyeffects-presets/` | EasyEffects audio presets |
 
 ## Kernel Build
 

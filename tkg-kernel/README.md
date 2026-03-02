@@ -2,7 +2,7 @@
 
 Configs and Patches I use to build kernel with TKG for my ASUS ROG Zephyrus G14 2023 (GA402XY) with bore scheduler.
 
-Can be usable for all laptops, ASUS it particular.
+Can be usable for all laptops, ASUS in particular.
 
 ## Build Configuration
 
