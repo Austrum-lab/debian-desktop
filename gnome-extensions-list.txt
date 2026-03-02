@@ -1,0 +1,25 @@
+# GNOME Extensions - Enabled
+# Get list: gnome-extensions list --enabled
+
+# === UI / VISUAL ===
+blur-my-shell@aunetx                    # Blur effect on overview and panels
+dash-to-dock@micxgx.gmail.com           # Convert dash to always-visible dock
+user-theme@gnome-shell-extensions       # Load shell themes from ~/.themes
+multi-monitors-add-on@spin83            # Multi-monitor enhancements
+
+# === PRODUCTIVITY ===
+workspace-indicator@gnome-shell         # Show workspace switcher in panel
+drive-menu@gnome-shell-extensions       # Disk mount/eject menu in panel
+quick-lang-switch@ankostis.gmail.com    # Quick keyboard layout switcher
+copyous@boerdereinar.dev                # Clipboard history manager
+
+# === SYSTEM MONITORING ===
+Vitals@CoreCoding.com                   # System stats (CPU, RAM, temps, fans)
+gpu-switcher-supergfxctl@chikobara      # GPU switching via supergfxctl (ASUS G14)
+appindicatorsupport@rgcjonas            # AppIndicator/KStatusNotifier support
+
+# === UTILITIES ===
+fullscreen-avoider@noobsai              # Prevent windows from going fullscreen
+guillotine@fopdoodle                    # Tiling window manager extension
+draw-on-gnome@daveprowse                # Draw on screen (presentations)
+pointer-tracker@garz.dev                # Multi-pointer tracking on screen

@@ -1,9 +1,23 @@
-deb-desktop
-=======
+# Debian Desktop
+
+Debian Testing + GNOME desktop configuration for home usage with laptop (i'm on ASUS ROG Zephyrus G14 2023 [GA402XY])
+
 Repo contains some files, scripts and configs and info about using debian testing as desktop OS with Gnome DE
 
-## Software
-In software-list.txt you can find short software list i'm dailydriving.
+## Repository Structure
 
-## Gnome extentions
-In gnome-extentions-list.txt you can find gnome extentions i'm using.
+| Path | Description |
+|------|-------------|
+| `scripts/` | Some scripts |
+| `etc/` | System configs (apt, modprobe, sysctl, environment) |
+| `tkg-kernel/` | TKG kernel configs and patches |
+| `easyeffect-presets/` | EasyEffects audio presets |
+
+## Kernel Build
+
+See [tkg-kernel/README.md](tkg-kernel/README.md) for detailed instructions.
+
+## More Info
+
+- [Software List](software-list.txt)
+- [GNOME Extensions](gnome-extensions-list.txt)

@@ -1,47 +1,52 @@
-Terminals:
-- Tabby - main terminal https://github.com/eugeny/tabby
-- Gnome Terminal
+================================================================================
+SOFTWARE LIST - Debian Desktop (ASUS G14 2023)
+================================================================================
 
-Browsers:
-- Floorp - main browser https://floorp.app/en
-- Zen browser - for work https://zen-browser.app/
-- Firefox
-- Junction - a useful tool for browser selection https://apps.gnome.org/Junction/
+=== TERMINALS ===
+- Tabby (main)         — https://github.com/eugeny/tabby
+- Gnome Terminal       — default GNOME terminal
 
-Office:
-- Onlyoffice - https://www.onlyoffice.com/desktop.aspx
+=== BROWSERS ===
+- Floorp (main)        — https://floorp.app/en
+- Zen Browser (work)   — https://zen-browser.app/
+- Firefox              — from Debian repo
+- Junction             — https://apps.gnome.org/Junction/ (browser selector)
 
-Text and code editing:
-- Cursor - https://cursor.com/
-- VSCodium - open fork for MS VScode https://github.com/VSCodium/vscodium
-- Zed - https://zed.dev/
+=== OFFICE ===
+- OnlyOffice           — https://www.onlyoffice.com/desktop.aspx
 
-Remote connections:
-- goto (gg) - terminal ssh connection manager https://github.com/grafviktor/goto
-- xpipe - connection manager https://xpipe.io/
-- Rustdesk - remote access tool https://rustdesk.com/
-- Winbox - mikrotik tool https://flathub.org/apps/com.mikrotik.WinBox
+=== CODE EDITORS ===
+- Cursor               — https://cursor.com/
+- VSCodium             — https://github.com/VSCodium/vscodium
+- Zed                  — https://zed.dev/
 
-Images and Video Stuff:
-- Krita - images editing tool https://krita.org/en/
-- mpv - video player https://mpv.io/
+=== REMOTE ACCESS ===
+- goto (gg)            — https://github.com/grafviktor/goto (terminal SSH manager)
+- xpipe                — https://xpipe.io/ (connection manager)
+- RustDesk             — https://rustdesk.com/ (remote desktop)
+- WinBox               — https://flathub.org/apps/com.mikrotik.WinBox (MikroTik)
 
-Sound Stuff:
-- easyeffects - good sound equalizer tool https://github.com/wwmm/easyeffects (https://flathub.org/apps/com.github.wwmm.easyeffects)
+=== MEDIA ===
+- Krita                — https://krita.org/en/ (image editing)
+- MPV                  — https://mpv.io/ (video player)
 
-Working and productivity stuff:
-- Gnome Calendar - just default Gnome DE Calendar app
-- Evolution - mail client from gnome (currently i'm looking for a replacement - i'm thinking of Thunderbird)
-- Drawio - diagram software
+=== AUDIO ===
+- EasyEffects          — https://github.com/wwmm/easyeffects
+                         https://flathub.org/apps/com.github.wwmm.easyeffects
 
-Games stuff
-- Steam - i'm using debian version from the repo
-- Heroic launcher - very useful tool, i didn't launch anything with just raw wine for a while https://heroicgameslauncher.com/
-- ProtonUp-Qt - manage proton versions (for Steam and Heroic) https://davidotek.github.io/protonup-qt/
-- MangoHud - nice overlay for games, need to be built from scratch (because prebuilt repo versions does not contain some nvidia libs to work with) https://github.com/flightlessmango/MangoHud
+=== PRODUCTIVITY ===
+- Gnome Calendar       — default GNOME calendar
+- Evolution            — default GNOME mail client (considering Thunderbird)
+- DrawIO               — diagram software
 
-Kernels and firmware:
-- TKG Kernel - it's just good https://github.com/Frogging-Family/linux-tkg
-- linux-g14 - patches and addons for asus laptops https://gitlab.com/asus-linux/linux-g14/
-- Firmware repo - just fresh firmware from main repo. Not a software but https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+=== GAMING ===
+- Steam                — from Debian repo
+- Heroic Launcher      — https://heroicgameslauncher.com/
+- ProtonUp-Qt          — https://davidotek.github.io/protonup-qt/
+- MangoHud             — https://github.com/flightlessmango/MangoHud
+                         (build from source for NVIDIA support)
 
+=== KERNEL & FIRMWARE ===
+- TKG Kernel           — https://github.com/Frogging-Family/linux-tkg
+- linux-g14            — https://gitlab.com/asus-linux/linux-g14/
+- linux-firmware       — https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git

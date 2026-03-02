@@ -1,0 +1,17 @@
+*.bzImage
+*.vmlinuz
+*.initramfs
+
+*.bak
+*.swp
+*~
+
+*.config.local
+localversion*
+
+*.priv.pem
+*.crt.der
+MOK*
+
+.DS_Store
+Thumbs.db

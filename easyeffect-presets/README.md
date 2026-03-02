@@ -1,13 +1,87 @@
-# Easy Effets presets
+# EasyEffects Presets
 
-Just presets i'm using on my device.
+Audio (input and output) presets I use for my ASUS ROG G14 2023
 
-g14_headphones_voice.json - Fine output preset i made for my 3.5 headphones (rog cetra 2)<br>
-EEGuide+Exciter (output device preset) - source https://github.com/cab404/framework-dsp
+## Presets List
 
-fifine_am5_usb_mic.json - Fine mic preset I made for my Fifine AM5 (but it is also good with my 3.5 headphones mic)<br>
-fifine_mic_old.json (input device preset) - Old mic preset I made for my Fifine AM5<br>
-Masc NPR Voice + Noise Reduction (input device preset) - source https://gist.github.com/jtrv/47542c8be6345951802eebcf9dc7da31
+| Preset | Type |Description | Device | External Link |
+|--------|---|--------|--------|--------|
+| `g14_headphones_voice.json` | Output | Custom preset for 3.5mm headphones | ROG Cetra 2 / Universal |  |
+| `EEGuide+Exciter.json` | Output | Bass enhancer + exciter | Universal | https://github.com/cab404/framework-dsp |
+| `fifine_am5_usb_mic.json` | Input | Main mic preset | Fifine AM5 (USB) / Universal |  |
+| `fifine_mic_old.json` | Input | Old mic preset | Fifine AM5 (USB) / Universal |  |
+| `masc_npr_voice.json` | Input | Voice preset | Universal | https://gist.github.com/jtrv/47542c8be6345951802eebcf9dc7da31 |
+
+### g14_headphones_voice.json Signal Chain
+
+```
+Filter (90Hz Low-shelf +1.5dB)
+    ↓
+Filter (250Hz Bell -2dB)
+    ↓
+Filter (1500Hz Bell +2.5dB)
+    ↓
+Filter (3500Hz Bell +2dB)
+    ↓
+Bass Enhancer (amount: 3.0, floor: 10Hz)
+    ↓
+Exciter (amount: 1.0, ceil: 15kHz)
+    ↓
+Multiband Compressor (4 bands active)
+    ↓
+Multiband Compressor #2 (bypassed)
+    ↓
+Stereo Tools (stereo-base: 0.45)
+    ↓
+Limiter (threshold: -1dB, gain-boost: enabled, input-gain: 0dB, output-gain: 0dB)
+```
 
 
-(flatpak) Put it to ~/.var/app/com.github.wwmm.easyeffects/config/easyeffects/
+### fifine_am5_usb_mic.json Signal Chain
+
+```
+Filter (High-pass 100Hz, 24dB/oct)
+    ↓
+Gate (threshold: -48dB, reduction: -24dB)
+    ↓
+Deesser (threshold: -22dB, f1: 5.5kHz, f2: 6.5kHz)
+    ↓
+Compressor (threshold: -18dB, ratio: 2.8, makeup: 3dB)
+    ↓
+Multiband Compressor (bypassed)
+    ↓
+RNNoise (VAD enabled, threshold: 70)
+    ↓
+Limiter (threshold: -2dB)
+```
+
+---
+
+## Installation
+
+### Flatpak
+
+```bash
+mkdir -p ~/.var/app/com.github.wwmm.easyeffects/data/easyeffects/output/
+mkdir -p ~/.var/app/com.github.wwmm.easyeffects/data/easyeffects/input/
+
+cp output/*.json ~/.var/app/com.github.wwmm.easyeffects/data/easyeffects/output/
+cp input/*.json ~/.var/app/com.github.wwmm.easyeffects/data/easyeffects/input/
+```
+
+### System Package
+
+```bash
+mkdir -p ~/.config/easyeffects/output/
+mkdir -p ~/.config/easyeffects/input/
+
+cp output/*.json ~/.config/easyeffects/output/
+cp input/*.json ~/.config/easyeffects/input/
+```
+
+### Import via GUI
+
+1. Open EasyEffects
+2. Go to Presets menu
+3. Click "Import"
+4. Select the JSON file

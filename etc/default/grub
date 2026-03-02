@@ -6,7 +6,9 @@
 GRUB_DEFAULT=0
 GRUB_TIMEOUT=3
 GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )`
-GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1 nvidia_drm.fbdev=1 initcall_blacklist=simpledrm_platform_driver_init modprobe.blacklist=ucsi_acpi split_lock_detect=off"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1 nvidia_drm.fbdev=1"
+# sometimes help with dual gpu issues
+#GRUB_CMDLINE_LINUX_DEFAULT="quiet nvidia-drm.modeset=1 nvidia_drm.fbdev=1 initcall_blacklist=simpledrm_platform_driver_init modprobe.blacklist=ucsi_acpi split_lock_detect=off"
 GRUB_CMDLINE_LINUX=""
 
 GRUB_DISABLE_OS_PROBER=false
