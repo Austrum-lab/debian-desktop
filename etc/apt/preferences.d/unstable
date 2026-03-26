@@ -4,14 +4,14 @@ Pin: release a=unstable
 Pin-Priority: 500
 
 # DE, compositor and utilities to work with them
-#Package: *gnome* *gsetting* *gtk* *mutter* *wayland* *nautilus* *gdm* *network-manager* *wayland*:i386 *totem*
-#Pin: release a=unstable
-#Pin-Priority: 500
+Package: *gnome* *gsetting* *gtk* *mutter* *wayland* *nautilus* *gdm* *network-manager* *wayland*:i386 *totem* *gnome*:i386 *gsetting*:i386 *gtk*:i386 *mutter*:i386 *nautilus*:i386 *gdm*:i386 *network-manager*:i386
+Pin: release a=unstable
+Pin-Priority: 500
 
 # Sound stuff
-#Package: *pipewire* *alsa* *wireplumber*
-#Pin: release a=unstable
-#Pin-Priority: 500
+Package: *pipewire* *alsa* *wireplumber* *pipewire*:i386 *alsa*:i386 *wireplumber*:i386
+Pin: release a=unstable
+Pin-Priority: 500
 
 # Software needed from unstable
 #Package: *krita* *thunderbird*

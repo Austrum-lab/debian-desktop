@@ -1,0 +1,34 @@
+From 5a869939291424ad3dd751c4766809aec9f18361 Mon Sep 17 00:00:00 2001
+From: Antheas Kapenekakis <lkml@antheas.dev>
+Date: Thu, 22 Jan 2026 08:50:36 +0100
+Subject: [PATCH v11 03/11] HID: asus: use same report_id in response
+
+Currently, asus_kbd_get_functions prods the device using feature
+report report_id, but then is hardcoded to check the response through
+FEATURE_KBD_REPORT_ID. This only works if report_id is that value
+(currently true). So, use report_id in the response as well to
+maintain functionality if that value changes in the future.
+
+Reviewed-by: Denis Benato <benato.denis96@gmail.com>
+Acked-by: Benjamin Tissoires <bentiss@kernel.org>
+Signed-off-by: Antheas Kapenekakis <lkml@antheas.dev>
+---
+ drivers/hid/hid-asus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/hid/hid-asus.c b/drivers/hid/hid-asus.c
+index 92904b5a700c..2ff2170dc30a 100644
+--- a/drivers/hid/hid-asus.c
++++ b/drivers/hid/hid-asus.c
+@@ -424,7 +424,7 @@ static int asus_kbd_get_functions(struct hid_device *hdev,
+ 	if (!readbuf)
+ 		return -ENOMEM;
+ 
+-	ret = hid_hw_raw_request(hdev, FEATURE_KBD_REPORT_ID, readbuf,
++	ret = hid_hw_raw_request(hdev, report_id, readbuf,
+ 				 FEATURE_KBD_REPORT_SIZE, HID_FEATURE_REPORT,
+ 				 HID_REQ_GET_REPORT);
+ 	if (ret < 0) {
+-- 
+2.53.0
+

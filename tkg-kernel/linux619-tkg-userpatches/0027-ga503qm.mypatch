@@ -1,0 +1,48 @@
+From: Denis Benato <denis.benato@linux.dev>
+To: linux-kernel@vger.kernel.org
+Cc: platform-driver-x86@vger.kernel.org,
+	"Hans de Goede" <hansg@kernel.org>,
+	"Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>,
+	"Luke D . Jones" <luke@ljones.dev>,
+	"Mateusz Schyboll" <dragonn@op.pl>,
+	"Denis Benato" <benato.denis96@gmail.com>,
+	"Denis Benato" <denis.benato@linux.dev>
+Subject: [PATCH 1/2] platform/x86: asus-armoury: add support for GA503QM
+Date: Mon,  9 Mar 2026 19:35:57 +0100	[thread overview]
+Message-ID: <20260309183559.433555-2-denis.benato@linux.dev> (raw)
+In-Reply-To: <20260309183559.433555-1-denis.benato@linux.dev>
+
+Add TDP data for laptop model GA503QM.
+
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
+---
+ drivers/platform/x86/asus-armoury.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/platform/x86/asus-armoury.h b/drivers/platform/x86/asus-armoury.h
+index 6e9703bd5017..6565dd4c36c5 100644
+--- a/drivers/platform/x86/asus-armoury.h
++++ b/drivers/platform/x86/asus-armoury.h
+@@ -1051,6 +1051,20 @@ static const struct dmi_system_id power_limits[] = {
+ 			.requires_fan_curve = true,
+ 		},
+ 	},
++	{
++		.matches = {
++			DMI_MATCH(DMI_BOARD_NAME, "GA503QM"),
++		},
++		.driver_data = &(struct power_data) {
++			.ac_data = &(struct power_limits) {
++				.ppt_pl1_spl_min = 15,
++				.ppt_pl1_spl_def = 35,
++				.ppt_pl1_spl_max = 80,
++				.ppt_pl2_sppt_min = 65,
++				.ppt_pl2_sppt_max = 80,
++			},
++		},
++	},
+ 	{
+ 		.matches = {
+ 			DMI_MATCH(DMI_BOARD_NAME, "GA503QR"),
+-- 
+2.53.0

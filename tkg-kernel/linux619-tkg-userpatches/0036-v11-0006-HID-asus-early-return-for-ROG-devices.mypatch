@@ -1,0 +1,42 @@
+From 569baf31e2c9b61e53b40aeb7e8da911688c3e93 Mon Sep 17 00:00:00 2001
+From: Antheas Kapenekakis <lkml@antheas.dev>
+Date: Thu, 22 Jan 2026 08:50:39 +0100
+Subject: [PATCH v11 06/11] HID: asus: early return for ROG devices
+
+Some ROG devices have a new dynamic backlight interface for control by
+Windows. This interface does not create an ->input device, causing the
+kernel to print an error message and to eject it. In addition, ROG
+devices have proper HID names in their descriptors so renaming them is
+not necessary.
+
+Therefore, if a device is identified as ROG, early return from probe to
+skip renaming and ->input checks.
+
+Acked-by: Benjamin Tissoires <bentiss@kernel.org>
+Reviewed-by: Denis Benato <benato.denis96@gmail.com>
+Signed-off-by: Antheas Kapenekakis <lkml@antheas.dev>
+---
+ drivers/hid/hid-asus.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/hid/hid-asus.c b/drivers/hid/hid-asus.c
+index dc8795b59cc2..6084ec66a134 100644
+--- a/drivers/hid/hid-asus.c
++++ b/drivers/hid/hid-asus.c
+@@ -1232,6 +1232,13 @@ static int asus_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ 	    asus_kbd_register_leds(hdev))
+ 		hid_warn(hdev, "Failed to initialize backlight.\n");
+ 
++	/*
++	 * For ROG keyboards, skip rename for consistency and ->input check as
++	 * some devices do not have inputs.
++	 */
++	if (drvdata->quirks & QUIRK_ROG_NKEY_KEYBOARD)
++		return 0;
++
+ 	/*
+ 	 * Check that input registration succeeded. Checking that
+ 	 * HID_CLAIMED_INPUT is set prevents a UAF when all input devices
+-- 
+2.53.0
+

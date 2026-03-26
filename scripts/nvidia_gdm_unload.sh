@@ -7,8 +7,6 @@
 #   sudo ./nvidia_gdm_unload.sh
 #
 
-set -e
-
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
     echo "Error: Please run as root (sudo)"
@@ -23,7 +21,7 @@ systemctl stop nvidia-powerd.service
 
 echo "Unloading NVIDIA modules..."
 
-modprobe -r nvidia_wmi_ec_backlight || true
+modprobe -r nvidia_wmi_ec_backlight
 modprobe -r nvidia_uvm
 modprobe -r nvidia_drm
 modprobe -r nvidia_modeset

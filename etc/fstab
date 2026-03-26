@@ -10,7 +10,7 @@ LABEL=EFI  /boot/efi  vfat   umask=0077  0 1
 LABEL=OPT  /opt       f2fs   noatime,lazytime,atgc,gc_merge  0 2
 
 # swap
-/var/swap/swapfile  none  swap  sw  0 0
+/var/swap/swapfile none swap sw 0 0
 
 # BIND MOUNTS
 #/opt/_software/flatpak     /var/lib/flatpak      none  bind,x-systemd.requires-mounts-for=/opt,nofail,x-gvfs-hide  0 0

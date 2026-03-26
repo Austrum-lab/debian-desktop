@@ -13,4 +13,4 @@ GRUB_CMDLINE_LINUX=""
 
 GRUB_DISABLE_OS_PROBER=false
 
-GRUB_BACKGROUND=/home/${USER}/Pictures/grub.png
+GRUB_BACKGROUND=/home/kaa/Pictures/grub.png

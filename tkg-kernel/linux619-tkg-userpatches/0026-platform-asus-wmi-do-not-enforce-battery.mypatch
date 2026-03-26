@@ -1,0 +1,61 @@
+From: Denis Benato <denis.benato@linux.dev>
+To: linux-kernel@vger.kernel.org
+Cc: platform-driver-x86@vger.kernel.org,
+	"Hans de Goede" <hansg@kernel.org>,
+	"Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>,
+	"Luke D . Jones" <luke@ljones.dev>,
+	"Derek John Clark" <derekjohn.clark@gmail.com>,
+	"Denis Benato" <benato.denis96@gmail.com>,
+	"Denis Benato" <denis.benato@linux.dev>,
+	"Antheas Kapenekakis" <lkml@antheas.dev>
+Subject: [PATCH] platform/x86: asus-wmi: do not enforce a battery charge threshold
+Date: Wed,  4 Mar 2026 14:26:08 +0100	[thread overview]
+Message-ID: <20260304132608.33815-1-denis.benato@linux.dev> (raw)
+
+Users are complaining for the battery limit being reset at 100% during
+the boot process while the general consensus appears to not apply
+unsolecited hardware changes, therefore stop resetting the battery
+charge limit at boot and return -ENODATA on charge_end_threshold to
+signal for an unknown limit.
+
+Suggested-by: Antheas Kapenekakis <lkml@antheas.dev>
+Suggested-by: Derek J. Clark <derekjohn.clark@gmail.com>
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
+---
+ drivers/platform/x86/asus-wmi.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/platform/x86/asus-wmi.c b/drivers/platform/x86/asus-wmi.c
+index 6ba49bd375df..dc330a8ee2f2 100644
+--- a/drivers/platform/x86/asus-wmi.c
++++ b/drivers/platform/x86/asus-wmi.c
+@@ -1557,7 +1557,10 @@ static ssize_t charge_control_end_threshold_show(struct device *device,
+ 						 struct device_attribute *attr,
+ 						 char *buf)
+ {
+-	return sysfs_emit(buf, "%d\n", charge_end_threshold);
++	if ((charge_end_threshold >= 0) && (charge_end_threshold <= 100))
++		return sysfs_emit(buf, "%d\n", charge_end_threshold);
++
++	return -ENODATA;
+ }
+ 
+ static DEVICE_ATTR_RW(charge_control_end_threshold);
+@@ -1580,11 +1583,11 @@ static int asus_wmi_battery_add(struct power_supply *battery, struct acpi_batter
+ 		return -ENODEV;
+ 
+ 	/* The charge threshold is only reset when the system is power cycled,
+-	 * and we can't get the current threshold so let set it to 100% when
+-	 * a battery is added.
++	 * and we can't read the current threshold, however the majority of
++	 * platforms retains it, therefore signal the threshold as unknown
++	 * until user explicitly sets it to a new value.
+ 	 */
+-	asus_wmi_set_devstate(ASUS_WMI_DEVID_RSOC, 100, NULL);
+-	charge_end_threshold = 100;
++	charge_end_threshold = -1;
+ 
+ 	return 0;
+ }
+-- 
+2.53.0

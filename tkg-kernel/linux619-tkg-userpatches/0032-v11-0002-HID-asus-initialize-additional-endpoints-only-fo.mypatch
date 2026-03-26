@@ -1,0 +1,82 @@
+From 2e0a39562fee081cc85e1f96a9cbea226e328484 Mon Sep 17 00:00:00 2001
+From: Antheas Kapenekakis <lkml@antheas.dev>
+Date: Thu, 22 Jan 2026 08:50:35 +0100
+Subject: [PATCH v11 02/11] HID: asus: initialize additional endpoints only for
+ certain devices
+
+Currently, ID1/ID2 initializations are performed for all NKEY devices.
+However, ID1 initializations are only required for RGB control and are
+only supported for RGB capable devices. ID2 initializations are only
+required for initializing the Anime display endpoint which is only
+supported on devices with an Anime display. Both of these
+initializations are for functionality that is not present on this driver
+and are performed for devices which might not support them.
+
+At the same time, there are older NKEY devices that have only been
+tested with these initializations in the kernel and it is not possible
+to recheck them. There is a possibility that especially with the ID1
+initialization, certain laptop models might have their shortcuts stop
+working (currently unproven).
+
+To avoid sending unnecessary commands, change to only initialize ID1/ID2
+for those NKEY devices suspected to be problematic without them by
+introducing a quirk for them and replacing the NKEY quirk in the block
+that performs the inits with that. Therefore, new devices that do not
+need (and some do not support) these initializations will not have
+them performed.
+
+In addition, as these initializations might not be supported by the
+affected devices, change the function to not bail if they fail.
+
+Acked-by: Benjamin Tissoires <bentiss@kernel.org>
+Signed-off-by: Antheas Kapenekakis <lkml@antheas.dev>
+---
+ drivers/hid/hid-asus.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/hid/hid-asus.c b/drivers/hid/hid-asus.c
+index 323e6302bac5..92904b5a700c 100644
+--- a/drivers/hid/hid-asus.c
++++ b/drivers/hid/hid-asus.c
+@@ -90,6 +90,7 @@ MODULE_DESCRIPTION("Asus HID Keyboard and TouchPad");
+ #define QUIRK_ROG_NKEY_KEYBOARD		BIT(11)
+ #define QUIRK_ROG_CLAYMORE_II_KEYBOARD BIT(12)
+ #define QUIRK_ROG_ALLY_XPAD		BIT(13)
++#define QUIRK_ROG_NKEY_ID1ID2_INIT		BIT(14)
+ 
+ #define I2C_KEYBOARD_QUIRKS			(QUIRK_FIX_NOTEBOOK_REPORT | \
+ 						 QUIRK_NO_INIT_REPORTS | \
+@@ -652,14 +653,9 @@ static int asus_kbd_register_leds(struct hid_device *hdev)
+ 	if (!(kbd_func & SUPPORT_KBD_BACKLIGHT))
+ 		return -ENODEV;
+ 
+-	if (drvdata->quirks & QUIRK_ROG_NKEY_KEYBOARD) {
+-		ret = asus_kbd_init(hdev, FEATURE_KBD_LED_REPORT_ID1);
+-		if (ret < 0)
+-			return ret;
+-
+-		ret = asus_kbd_init(hdev, FEATURE_KBD_LED_REPORT_ID2);
+-		if (ret < 0)
+-			return ret;
++	if (drvdata->quirks & QUIRK_ROG_NKEY_ID1ID2_INIT) {
++		asus_kbd_init(hdev, FEATURE_KBD_LED_REPORT_ID1);
++		asus_kbd_init(hdev, FEATURE_KBD_LED_REPORT_ID2);
+ 	}
+ 
+ 	if (dmi_match(DMI_PRODUCT_FAMILY, "ProArt P16")) {
+@@ -1376,10 +1372,10 @@ static const struct hid_device_id asus_devices[] = {
+ 	  QUIRK_USE_KBD_BACKLIGHT },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ASUSTEK,
+ 	    USB_DEVICE_ID_ASUSTEK_ROG_NKEY_KEYBOARD),
+-	  QUIRK_USE_KBD_BACKLIGHT | QUIRK_ROG_NKEY_KEYBOARD },
++	  QUIRK_USE_KBD_BACKLIGHT | QUIRK_ROG_NKEY_KEYBOARD | QUIRK_ROG_NKEY_ID1ID2_INIT },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ASUSTEK,
+ 	    USB_DEVICE_ID_ASUSTEK_ROG_NKEY_KEYBOARD2),
+-	  QUIRK_USE_KBD_BACKLIGHT | QUIRK_ROG_NKEY_KEYBOARD },
++	  QUIRK_USE_KBD_BACKLIGHT | QUIRK_ROG_NKEY_KEYBOARD | QUIRK_ROG_NKEY_ID1ID2_INIT },
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ASUSTEK,
+ 	    USB_DEVICE_ID_ASUSTEK_ROG_Z13_LIGHTBAR),
+ 	  QUIRK_USE_KBD_BACKLIGHT | QUIRK_ROG_NKEY_KEYBOARD },
+-- 
+2.53.0
+
