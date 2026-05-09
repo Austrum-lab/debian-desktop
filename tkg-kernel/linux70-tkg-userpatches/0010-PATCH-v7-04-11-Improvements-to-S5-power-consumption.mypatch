@@ -1,0 +1,772 @@
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v7 04/12] USB: Pass PMSG_POWEROFF event to suspend_common()
+Date: Tue,  9 Sep 2025 14:16:11 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-5-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+If powering off the system USB wakeup sources should be ignored.
+Add a new callback hcd_pci_poweroff() which will differentiate whether
+target state is halt or power off and pass PMSG_POWEROFF as the
+message so that suspend_common() will avoid doing wakeups.
+
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * Reword commit mesasge
+v6:
+ * Fix LKP robot issue without CONFIG_PM_SLEEP
+v5:
+ * New patch
+v4:
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+
+Fix lkp robot issue
+---
+ drivers/usb/core/hcd-pci.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/usb/core/hcd-pci.c b/drivers/usb/core/hcd-pci.c
+index cd223475917ef..921d1d0940016 100644
+--- a/drivers/usb/core/hcd-pci.c
++++ b/drivers/usb/core/hcd-pci.c
+@@ -6,6 +6,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
++#include <linux/pm.h>
+ #include <linux/usb.h>
+ #include <linux/usb/hcd.h>
+ 
+@@ -531,6 +532,13 @@ static int hcd_pci_freeze(struct device *dev)
+ 	return suspend_common(dev, PMSG_FREEZE);
+ }
+ 
++static int hcd_pci_poweroff(struct device *dev)
++{
++	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF)
++		return suspend_common(dev, PMSG_POWEROFF);
++	return suspend_common(dev, PMSG_SUSPEND);
++}
++
+ static int hcd_pci_suspend_noirq(struct device *dev)
+ {
+ 	struct pci_dev		*pci_dev = to_pci_dev(dev);
+@@ -602,6 +610,7 @@ static int hcd_pci_restore(struct device *dev)
+ #define hcd_pci_suspend		NULL
+ #define hcd_pci_freeze			NULL
+ #define hcd_pci_suspend_noirq	NULL
++#define hcd_pci_poweroff	NULL
+ #define hcd_pci_poweroff_late	NULL
+ #define hcd_pci_resume_noirq	NULL
+ #define hcd_pci_resume		NULL
+@@ -639,7 +648,7 @@ const struct dev_pm_ops usb_hcd_pci_pm_ops = {
+ 	.freeze_noirq	= check_root_hub_suspended,
+ 	.thaw_noirq	= NULL,
+ 	.thaw		= hcd_pci_resume,
+-	.poweroff	= hcd_pci_suspend,
++	.poweroff	= hcd_pci_poweroff,
+ 	.poweroff_late	= hcd_pci_poweroff_late,
+ 	.poweroff_noirq	= hcd_pci_suspend_noirq,
+ 	.restore_noirq	= hcd_pci_resume_noirq,
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v7 05/12] PCI/PM: Disable device wakeups when halting or powering off system
+Date: Tue,  9 Sep 2025 14:16:12 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-6-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+PCI devices can be configured as wakeup sources from low power states.
+However, when the system is halting or powering off such wakeups are
+not expected and may lead to spurious behavior.
+
+ACPI r6.5, section 16.1.5 notes:
+
+    "Hardware does allow a transition to S0 due to power button press
+     or a Remote Start."
+
+This implies that wakeups from PCI devices should not be relied upon
+in these states. To align with this expectation and avoid unintended
+wakeups, disable device wakeup capability during these transitions.
+
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * Reword title
+ * Reword commit
+v5:
+ * Re-order
+ * Add tags
+v4:
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+---
+ drivers/pci/pci-driver.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index 63665240ae87f..f201d298d7173 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -1139,6 +1139,10 @@ static int pci_pm_poweroff(struct device *dev)
+ 	struct pci_dev *pci_dev = to_pci_dev(dev);
+ 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
+ 
++	if (device_may_wakeup(dev) &&
++	    (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF))
++		device_set_wakeup_enable(dev, false);
++
+ 	if (pci_has_legacy_pm_support(pci_dev))
+ 		return pci_legacy_suspend(dev, PMSG_HIBERNATE);
+ 
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v7 06/12] PCI/PM: Split out code from pci_pm_suspend_noirq() into helper
+Date: Tue,  9 Sep 2025 14:16:13 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-7-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+In order to unify suspend and hibernate codepaths without code duplication
+the common code should be in common helpers.  Move it from
+pci_pm_suspend_noirq() into a helper.  No intended functional changes.
+
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * Reword title
+v5:
+ * Split from earlier patches
+ * Add tags
+v4:
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+---
+ drivers/pci/pci-driver.c | 81 +++++++++++++++++++++++++---------------
+ 1 file changed, 51 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index f201d298d7173..571a3809f163a 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -762,6 +762,54 @@ static void pci_pm_complete(struct device *dev)
+ 
+ #endif /* !CONFIG_PM_SLEEP */
+ 
++#if defined(CONFIG_SUSPEND)
++/**
++ * pci_pm_suspend_noirq_common
++ * @pci_dev: pci device
++ * @skip_bus_pm: pointer to a boolean indicating whether to skip bus PM
++ *
++ * Prepare the device to go into a low power state by saving state and
++ * deciding whether to skip bus PM.
++ *
++ */
++static void pci_pm_suspend_noirq_common(struct pci_dev *pci_dev, bool *skip_bus_pm)
++{
++	if (!pci_dev->state_saved) {
++		pci_save_state(pci_dev);
++
++		/*
++		 * If the device is a bridge with a child in D0 below it,
++		 * it needs to stay in D0, so check skip_bus_pm to avoid
++		 * putting it into a low-power state in that case.
++		 */
++		if (!pci_dev->skip_bus_pm && pci_power_manageable(pci_dev))
++			pci_prepare_to_sleep(pci_dev);
++	}
++
++	pci_dbg(pci_dev, "PCI PM: Sleep power state: %s\n",
++		pci_power_name(pci_dev->current_state));
++
++	if (pci_dev->current_state == PCI_D0) {
++		pci_dev->skip_bus_pm = true;
++		/*
++		 * Per PCI PM r1.2, table 6-1, a bridge must be in D0 if any
++		 * downstream device is in D0, so avoid changing the power state
++		 * of the parent bridge by setting the skip_bus_pm flag for it.
++		 */
++		if (pci_dev->bus->self)
++			pci_dev->bus->self->skip_bus_pm = true;
++	}
++
++	if (pci_dev->skip_bus_pm && pm_suspend_no_platform()) {
++		pci_dbg(pci_dev, "PCI PM: Skipped\n");
++		*skip_bus_pm = true;
++		return;
++	}
++
++	pci_pm_set_unknown_state(pci_dev);
++}
++#endif /* CONFIG_SUSPEND */
++
+ #ifdef CONFIG_SUSPEND
+ static void pcie_pme_root_status_cleanup(struct pci_dev *pci_dev)
+ {
+@@ -851,6 +899,7 @@ static int pci_pm_suspend_noirq(struct device *dev)
+ {
+ 	struct pci_dev *pci_dev = to_pci_dev(dev);
+ 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
++	bool skip_bus_pm = false;
+ 
+ 	if (dev_pm_skip_suspend(dev))
+ 		return 0;
+@@ -881,38 +930,10 @@ static int pci_pm_suspend_noirq(struct device *dev)
+ 		}
+ 	}
+ 
+-	if (!pci_dev->state_saved) {
+-		pci_save_state(pci_dev);
+-
+-		/*
+-		 * If the device is a bridge with a child in D0 below it,
+-		 * it needs to stay in D0, so check skip_bus_pm to avoid
+-		 * putting it into a low-power state in that case.
+-		 */
+-		if (!pci_dev->skip_bus_pm && pci_power_manageable(pci_dev))
+-			pci_prepare_to_sleep(pci_dev);
+-	}
+-
+-	pci_dbg(pci_dev, "PCI PM: Suspend power state: %s\n",
+-		pci_power_name(pci_dev->current_state));
++	pci_pm_suspend_noirq_common(pci_dev, &skip_bus_pm);
+ 
+-	if (pci_dev->current_state == PCI_D0) {
+-		pci_dev->skip_bus_pm = true;
+-		/*
+-		 * Per PCI PM r1.2, table 6-1, a bridge must be in D0 if any
+-		 * downstream device is in D0, so avoid changing the power state
+-		 * of the parent bridge by setting the skip_bus_pm flag for it.
+-		 */
+-		if (pci_dev->bus->self)
+-			pci_dev->bus->self->skip_bus_pm = true;
+-	}
+-
+-	if (pci_dev->skip_bus_pm && pm_suspend_no_platform()) {
+-		pci_dbg(pci_dev, "PCI PM: Skipped\n");
++	if (skip_bus_pm)
+ 		goto Fixup;
+-	}
+-
+-	pci_pm_set_unknown_state(pci_dev);
+ 
+ 	/*
+ 	 * Some BIOSes from ASUS have a bug: If a USB EHCI host controller's
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v7 07/12] PCI/PM: Run bridge power up actions as part of restore phase
+Date: Tue,  9 Sep 2025 14:16:14 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-8-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+Suspend resume actions will check the state of the device and whether
+bus PM should be skipped.  These same actions make sense during hibernation
+image restore.  Apply them there as well.
+
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * Reword title
+v5:
+ * Split out patch
+---
+ drivers/pci/pci-driver.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index 571a3809f163a..fb6f1f60b2f1f 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -1246,10 +1246,15 @@ static int pci_pm_restore_noirq(struct device *dev)
+ {
+ 	struct pci_dev *pci_dev = to_pci_dev(dev);
+ 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
++	pci_power_t prev_state = pci_dev->current_state;
++	bool skip_bus_pm = pci_dev->skip_bus_pm;
+ 
+ 	pci_pm_default_resume_early(pci_dev);
+ 	pci_fixup_device(pci_fixup_resume_early, pci_dev);
+ 
++	if (!skip_bus_pm && prev_state == PCI_D3cold)
++		pci_pm_bridge_power_up_actions(pci_dev);
++
+ 	if (pci_has_legacy_pm_support(pci_dev))
+ 		return 0;
+ 
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>
+Subject: [PATCH v7 08/12] PCI/PM: Use pci_power_manageable() in pci_pm_poweroff_noirq()
+Date: Tue,  9 Sep 2025 14:16:15 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-9-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+Devices with no subordinate should be put into D3 during hibernate, but
+devices that have bridge_d3 set should also be put to sleep during
+hibernate. Adjust the check in pci_pm_poweroff_noirq() to use
+pci_power_manageable() to cover those as well.
+
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * Reword title
+v5:
+ * Split out patch
+---
+ drivers/pci/pci-driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index fb6f1f60b2f1f..c563fd6af979d 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -1227,7 +1227,7 @@ static int pci_pm_poweroff_noirq(struct device *dev)
+ 			return error;
+ 	}
+ 
+-	if (!pci_dev->state_saved && !pci_has_subordinate(pci_dev))
++	if (!pci_dev->state_saved && pci_power_manageable(pci_dev))
+ 		pci_prepare_to_sleep(pci_dev);
+ 
+ 	/*
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>,
+	"Denis Benato" <benato.denis96@gmail.com>
+Subject: [PATCH v7 09/12] PCI: Put PCIe bridges with downstream devices into D3 at hibernate
+Date: Tue,  9 Sep 2025 14:16:16 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-10-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+During suspend, PCIe bridges with downstream devices are transitioned into
+a low power state (D3hot or D3cold) depending on platform capabilities.
+However, during hibernate, these bridges remain in D0, which can lead to
+unnecessary power consumption.
+
+Align the hibernate flow with suspend by updating pci_pm_poweroff_noirq()
+to use pci_pm_suspend_noirq_common(). This ensures that PCIe bridges with
+active downstream devices are properly transitioned to a low power state
+during hibernate.
+
+This change introduces a functional update: the hibernate path will now
+invoke pci_save_state(), and — unless bus-level power management is
+skipped — will transition the bridge into D3hot or D3cold as appropriate.
+
+Cc: AceLan Kao <acelan.kao@canonical.com>
+Cc: Kai-Heng Feng <kaihengf@nvidia.com>
+Cc: Mark Pearson <mpearson-lenovo@squebb.ca>
+Cc: Denis Benato <benato.denis96@gmail.com>
+Cc: Merthan Karakaş <m3rthn.k@gmail.com>
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v7:
+ * reword commit text
+v6:
+ * s/port/bridge/
+v5:
+ * Split out into more patches
+ * Rewrite commit
+ * Add tag
+v4:
+ * Use helper even when CONFIG_SUSPEND not set (LKP robot)
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+v3:
+ * Split out common code between suspend_noirq() and poweroff_noirq()
+   to a helper function
+ * https://lore.kernel.org/linux-pm/20250609024619.407257-1-superm1@kernel.org/T/#me6db0fb946e3d604a8f3d455128844ed802c82bb
+---
+ drivers/pci/pci-driver.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+index c563fd6af979d..5eedfbb0be8a4 100644
+--- a/drivers/pci/pci-driver.c
++++ b/drivers/pci/pci-driver.c
+@@ -762,7 +762,7 @@ static void pci_pm_complete(struct device *dev)
+ 
+ #endif /* !CONFIG_PM_SLEEP */
+ 
+-#if defined(CONFIG_SUSPEND)
++#if defined(CONFIG_SUSPEND) || defined(CONFIG_HIBERNATE_CALLBACKS)
+ /**
+  * pci_pm_suspend_noirq_common
+  * @pci_dev: pci device
+@@ -808,7 +808,7 @@ static void pci_pm_suspend_noirq_common(struct pci_dev *pci_dev, bool *skip_bus_
+ 
+ 	pci_pm_set_unknown_state(pci_dev);
+ }
+-#endif /* CONFIG_SUSPEND */
++#endif /* CONFIG_SUSPEND || CONFIG_HIBERNATE_CALLBACKS */
+ 
+ #ifdef CONFIG_SUSPEND
+ static void pcie_pme_root_status_cleanup(struct pci_dev *pci_dev)
+@@ -1164,6 +1164,8 @@ static int pci_pm_poweroff(struct device *dev)
+ 	    (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF))
+ 		device_set_wakeup_enable(dev, false);
+ 
++	pci_dev->skip_bus_pm = false;
++
+ 	if (pci_has_legacy_pm_support(pci_dev))
+ 		return pci_legacy_suspend(dev, PMSG_HIBERNATE);
+ 
+@@ -1206,6 +1208,7 @@ static int pci_pm_poweroff_noirq(struct device *dev)
+ {
+ 	struct pci_dev *pci_dev = to_pci_dev(dev);
+ 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
++	bool skip_bus_pm = false;
+ 
+ 	if (dev_pm_skip_suspend(dev))
+ 		return 0;
+@@ -1227,8 +1230,9 @@ static int pci_pm_poweroff_noirq(struct device *dev)
+ 			return error;
+ 	}
+ 
+-	if (!pci_dev->state_saved && pci_power_manageable(pci_dev))
+-		pci_prepare_to_sleep(pci_dev);
++	pci_pm_suspend_noirq_common(pci_dev, &skip_bus_pm);
++	if (skip_bus_pm)
++		goto Fixup;
+ 
+ 	/*
+ 	 * The reason for doing this here is the same as for the analogous code
+@@ -1237,6 +1241,7 @@ static int pci_pm_poweroff_noirq(struct device *dev)
+ 	if (pci_dev->class == PCI_CLASS_SERIAL_USB_EHCI)
+ 		pci_write_config_word(pci_dev, PCI_COMMAND, 0);
+ 
++Fixup:
+ 	pci_fixup_device(pci_fixup_suspend_late, pci_dev);
+ 
+ 	return 0;
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>,
+	"Denis Benato" <benato.denis96@gmail.com>,
+	"Alex Deucher" <alexander.deucher@amd.com>
+Subject: [PATCH v7 10/12] drm/amd: Avoid evicting resources at S5
+Date: Tue,  9 Sep 2025 14:16:17 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-11-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+Normally resources are evicted on dGPUs at suspend or hibernate and
+on APUs at hibernate.  These steps are unnecessary when using the S4
+callbacks to put the system into S5.
+
+Cc: AceLan Kao <acelan.kao@canonical.com>
+Cc: Kai-Heng Feng <kaihengf@nvidia.com>
+Cc: Mark Pearson <mpearson-lenovo@squebb.ca>
+Cc: Denis Benato <benato.denis96@gmail.com>
+Cc: Merthan Karakaş <m3rthn.k@gmail.com>
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Acked-by: Alex Deucher <alexander.deucher@amd.com>
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v5:
+ * No changes
+v4:
+ * Add A-b tag for Alex
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+---
+ drivers/gpu/drm/amd/amdgpu/amdgpu_device.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+index f9b4c4321f67c..4e4b7a63cc61e 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+@@ -5017,6 +5017,10 @@ static int amdgpu_device_evict_resources(struct amdgpu_device *adev)
+ 	if (!adev->in_s4 && (adev->flags & AMD_IS_APU))
+ 		return 0;
+ 
++	/* No need to evict when going to S5 through S4 callbacks */
++	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF)
++		return 0;
++
+ 	ret = amdgpu_ttm_evict_resources(adev, TTM_PL_VRAM);
+ 	if (ret) {
+ 		dev_warn(adev->dev, "evicting device resources failed\n");
+-- 
+2.43.0
+
+From: "Mario Limonciello (AMD)" <superm1@kernel.org>
+To: "Rafael J . Wysocki" <rafael@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>
+Cc: "Pavel Machek" <pavel@kernel.org>, "Len Brown" <lenb@kernel.org>,
+	"Christian König" <christian.koenig@amd.com>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	"Steven Rostedt" <rostedt@goodmis.org>,
+	linux-pm@vger.kernel.org (open list:HIBERNATION (aka Software
+	Suspend, aka swsusp)),
+	amd-gfx@lists.freedesktop.org (open list:RADEON and AMDGPU DRM
+	DRIVERS), dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	linux-scsi@vger.kernel.org (open list:SCSI SUBSYSTEM),
+	linux-usb@vger.kernel.org (open list:USB SUBSYSTEM),
+	linux-trace-kernel@vger.kernel.org (open list:TRACING),
+	"AceLan Kao" <acelan.kao@canonical.com>,
+	"Kai-Heng Feng" <kaihengf@nvidia.com>,
+	"Mark Pearson" <mpearson-lenovo@squebb.ca>,
+	"Merthan Karakaş" <m3rthn.k@gmail.com>,
+	"Eric Naim" <dnaim@cachyos.org>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	"Mario Limonciello (AMD)" <superm1@kernel.org>,
+	"Denis Benato" <benato.denis96@gmail.com>
+Subject: [PATCH v7 11/12] PM: Use hibernate flows for system power off
+Date: Tue,  9 Sep 2025 14:16:18 -0500	[thread overview]
+Message-ID: <20250909191619.2580169-12-superm1@kernel.org> (raw)
+In-Reply-To: <20250909191619.2580169-1-superm1@kernel.org>
+
+When the system is powered off the kernel will call device_shutdown()
+which will issue callbacks into PCI core to wake up a device and call
+it's shutdown() callback.  This will leave devices in ACPI D0 which can
+cause some devices to misbehave with spurious wakeups and also leave some
+devices on which will consume power needlessly.
+
+The issue won't happen if the device is in D3 before system shutdown, so
+putting device to low power state before shutdown solves the issue.
+
+ACPI Spec 6.5, "7.4.2.5 System \_S4 State" says "Devices states are
+compatible with the current Power Resource states. In other words, all
+devices are in the D3 state when the system state is S4."
+
+The following "7.4.2.6 System \_S5 State (Soft Off)" states "The S5
+state is similar to the S4 state except that OSPM does not save any
+context." so it's safe to assume devices should be at D3 for S5.
+
+To accomplish this, use the PMSG_POWEROFF event to call all the device
+hibernate callbacks when the kernel is compiled with hibernate support.
+If compiled without hibernate support or hibernate fails fall back into
+the previous shutdown flow.
+
+Cc: AceLan Kao <acelan.kao@canonical.com>
+Cc: Kai-Heng Feng <kaihengf@nvidia.com>
+Cc: Mark Pearson <mpearson-lenovo@squebb.ca>
+Cc: Merthan Karakaş <m3rthn.k@gmail.com>
+Tested-by: Eric Naim <dnaim@cachyos.org>
+Tested-by: Denis Benato <benato.denis96@gmail.com>
+Link: https://lore.kernel.org/linux-pci/20231213182656.6165-1-mario.limonciello@amd.com/
+Link: https://lore.kernel.org/linux-pci/20250506041934.1409302-1-superm1@kernel.org/
+Signed-off-by: Mario Limonciello (AMD) <superm1@kernel.org>
+---
+v5:
+ * split to multiple commits, re-order
+v4:
+ * https://lore.kernel.org/linux-pci/20250616175019.3471583-1-superm1@kernel.org/
+v3:
+ * Add new PMSG_POWEROFF and PM_EVENT_POWEROFF which alias to poweroff
+   callbacks
+ * Don't try to cleanup on dpm_suspend_start() or dpm_suspend_end() failures
+   Jump right into normal shutdown flow instead.
+ * https://lore.kernel.org/linux-pm/20250609024619.407257-1-superm1@kernel.org/T/#me6db0fb946e3d604a8f3d455128844ed802c82bb
+---
+ kernel/reboot.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/kernel/reboot.c b/kernel/reboot.c
+index ec087827c85cd..c8835f8e5f271 100644
+--- a/kernel/reboot.c
++++ b/kernel/reboot.c
+@@ -13,6 +13,7 @@
+ #include <linux/kexec.h>
+ #include <linux/kmod.h>
+ #include <linux/kmsg_dump.h>
++#include <linux/pm.h>
+ #include <linux/reboot.h>
+ #include <linux/suspend.h>
+ #include <linux/syscalls.h>
+@@ -305,6 +306,11 @@ static void kernel_shutdown_prepare(enum system_states state)
+ 		(state == SYSTEM_HALT) ? SYS_HALT : SYS_POWER_OFF, NULL);
+ 	system_state = state;
+ 	usermodehelper_disable();
++#ifdef CONFIG_HIBERNATE_CALLBACKS
++	if (!dpm_suspend_start(PMSG_POWEROFF) && !dpm_suspend_end(PMSG_POWEROFF))
++		return;
++	pr_emerg("Failed to power off devices, using shutdown instead.\n");
++#endif
+ 	device_shutdown();
+ }
+ /**
+-- 
+2.43.0
+

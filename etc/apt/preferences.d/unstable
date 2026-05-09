@@ -1,5 +1,6 @@
+
 # MESA stuff
-Package: *egl* *egl*:i386 *mesa* *mesa*:i386 *amd* *amd*:i386 *gbm* *gbm*:i386 *libwayland* *libwayland*:i386
+Package: *egl* *egl*:i386 *mesa* *mesa*:i386 *drm* *drm*:i386 *gbm* *gbm*:i386 *libwayland* *libwayland*:i386
 Pin: release a=unstable
 Pin-Priority: 500
 
@@ -9,19 +10,14 @@ Pin: release a=unstable
 Pin-Priority: 500
 
 # Sound stuff
-Package: *pipewire* *alsa* *wireplumber* *pipewire*:i386 *alsa*:i386 *wireplumber*:i386
+Package: *pipewire* *alsa* *wireplumber* *pipewire*:i386 *alsa*:i386 *wireplumber*:i386 *spa* *spa*:i386
 Pin: release a=unstable
 Pin-Priority: 500
 
-# Software needed from unstable
-#Package: *krita* *thunderbird*
-#Pin: release a=unstable
-#Pin-Priority: 500
-
-# Some Dependencies
-#Package: libspa* libnma* libgoa* *software-properties* libgail* libffad* *cups* *adwaita* libnm* libnm*:i386 libwnck* *qtbase* *qt6* *qt5* *mlt*
-#Pin: release a=unstable
-#Pin-Priority: 500
+# Some dependesies
+Package: *webkit2* *webkit2*:i386 *libnm* *libnm*:i386
+Pin: release a=unstable
+Pin-Priority: 500
 
 # Lower unstable pin-priority to 5 for all not specified packages
 Package: *
