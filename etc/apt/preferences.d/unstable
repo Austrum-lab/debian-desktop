@@ -1,3 +1,7 @@
+# Excludes
+Package: *qt*
+Pin: release a=unstable
+Pin-Priority: 5
 
 # MESA stuff
 Package: *egl* *egl*:i386 *mesa* *mesa*:i386 *drm* *drm*:i386 *gbm* *gbm*:i386 *libwayland* *libwayland*:i386

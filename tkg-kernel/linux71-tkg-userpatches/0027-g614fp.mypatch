@@ -1,0 +1,69 @@
+From: Denis Benato <denis.benato@linux.dev>
+To: linux-kernel@vger.kernel.org
+Cc: platform-driver-x86@vger.kernel.org,
+	"Hans de Goede" <hansg@kernel.org>,
+	"Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>,
+	"Luke D . Jones" <luke@ljones.dev>,
+	"Mateusz Schyboll" <dragonn@op.pl>,
+	"Denis Benato" <benato.denis96@gmail.com>,
+	"Denis Benato" <denis.benato@linux.dev>
+Subject: [PATCH 2/2] platform/x86: asus-armoury: add support for G614FP
+Date: Mon,  9 Mar 2026 19:35:58 +0100	[thread overview]
+Message-ID: <20260309183559.433555-3-denis.benato@linux.dev> (raw)
+In-Reply-To: <20260309183559.433555-1-denis.benato@linux.dev>
+
+Add TDP data for laptop model G614FP.
+
+Signed-off-by: Denis Benato <denis.benato@linux.dev>
+---
+ drivers/platform/x86/asus-armoury.h | 34 +++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/platform/x86/asus-armoury.h b/drivers/platform/x86/asus-armoury.h
+index 6565dd4c36c5..500097e465fd 100644
+--- a/drivers/platform/x86/asus-armoury.h
++++ b/drivers/platform/x86/asus-armoury.h
+@@ -1549,6 +1549,40 @@ static const struct dmi_system_id power_limits[] = {
+ 			.requires_fan_curve = true,
+ 		},
+ 	},
++	{
++		.matches = {
++			DMI_MATCH(DMI_BOARD_NAME, "G614FP"),
++		},
++		.driver_data = &(struct power_data) {
++			.ac_data = &(struct power_limits) {
++				.ppt_pl1_spl_min = 30,
++				.ppt_pl1_spl_max = 120,
++				.ppt_pl2_sppt_min = 65,
++				.ppt_pl2_sppt_def = 140,
++				.ppt_pl2_sppt_max = 165,
++				.ppt_pl3_fppt_min = 65,
++				.ppt_pl3_fppt_def = 140,
++				.ppt_pl3_fppt_max = 165,
++				.nv_temp_target_min = 75,
++				.nv_temp_target_max = 87,
++				.nv_dynamic_boost_min = 5,
++				.nv_dynamic_boost_max = 15,
++				.nv_tgp_min = 50,
++				.nv_tgp_max = 100,
++			},
++			.dc_data = &(struct power_limits) {
++				.ppt_pl1_spl_min = 25,
++				.ppt_pl1_spl_max = 65,
++				.ppt_pl2_sppt_min = 25,
++				.ppt_pl2_sppt_max = 65,
++				.ppt_pl3_fppt_min = 35,
++				.ppt_pl3_fppt_max = 75,
++				.nv_temp_target_min = 75,
++				.nv_temp_target_max = 87,
++			},
++			.requires_fan_curve = true,
++		},
++	},
+ 	{
+ 		.matches = {
+ 			DMI_MATCH(DMI_BOARD_NAME, "G614J"),
+-- 
+2.53.0
+

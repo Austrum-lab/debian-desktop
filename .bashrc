@@ -76,3 +76,5 @@ OLLAMA_MODELS=/opt/_ai/_models/ollama
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+alias vencord-install='sh -c "$(curl -sS https://vencord.dev/install.sh)"'
