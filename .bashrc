@@ -15,21 +15,10 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
+color_prompt=yes
 force_color_prompt=yes
 
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	color_prompt=yes
-    else
-	color_prompt=
-    fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 unset color_prompt force_color_prompt
 
@@ -71,10 +60,23 @@ export LD_LIBRARY_PATH="/home/kaa/.tensornvme/lib:$LD_LIBRARY_PATH"
 
 alias sudo='sudo -E'
 
-OLLAMA_MODELS=/opt/_ai/_models/ollama
+export OLLAMA_MODELS=/opt/_ai/_models/ollama
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 alias vencord-install='sh -c "$(curl -sS https://vencord.dev/install.sh)"'
+
+amd_boost() {
+    case "$1" in
+        on) boost=1; pstate="active" ;;
+        off) boost=0; pstate="guided" ;;
+        *) return 1 ;;
+    esac
+
+    [[ -n $2 ]] && echo "$2" | sudo tee /sys/devices/system/cpu/amd_pstate/status >/dev/null
+    echo "$pstate" | sudo tee /sys/devices/system/cpu/amd_pstate/status >/dev/null
+    sleep 0.5
+    echo "$boost" | sudo tee /sys/devices/system/cpu/cpufreq/boost >/dev/null
+}

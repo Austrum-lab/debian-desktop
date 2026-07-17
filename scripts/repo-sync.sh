@@ -20,10 +20,14 @@ declare -A DIR_MAPPINGS=(
     [".config/MangoHud"]="$HOME/.config/MangoHud"
     [".config/pipewire"]="$HOME/.config/pipewire"
     [".config/autostart"]="$HOME/.config/autostart"
+    ["etc/dbus-1/system.d"]="/etc/dbus-1/system.d"
+    [".config/environment.d"]="$HOME/.config/environment.d"
 )
 declare -A FILE_MAPPINGS=(
     ["etc/fstab"]="/etc/fstab"
     [".bashrc"]="$HOME/.bashrc"
+    ["etc/asusd/asusd.ron"]="/etc/asusd/asusd.ron"
+    ["etc/asusd/fan_curves.ron"]="/etc/asusd/fan_curves.ron"
 )
 
 # Blacklist: ["dir"]="*" for all, ["dir"]="file1 file2" for specific
@@ -38,6 +42,7 @@ declare -A WHITELIST=(
     ["etc/default"]="grub zramswap"
     ["etc/apt"]="sources.list unstable"
     [".config/autostart"]="slack.desktop rog-control-center.desktop"
+    ["etc/dbus-1/system.d"]="nvidia-powerd.conf"
 )
 declare -a IGNORE_PATTERNS=("*.swp" "*.bak" "*~" "*.orig" "*.rej")
 INCLUDE_NEW=false MERGE_SOURCE="local"

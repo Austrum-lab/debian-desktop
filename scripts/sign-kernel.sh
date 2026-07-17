@@ -21,7 +21,7 @@ set -e
 MOK_FOLDER=/opt/_src
 MOK_NAME=MOK
 KERNEL_VERSION=$(uname -r)
-#KERNEL_VERSION=7.1.1-tkg-bore
+#KERNEL_VERSION=7.1.3-tkg-bore
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

@@ -8,7 +8,7 @@ Can be usable for all laptops, ASUS in particular.
 
 | Parameter | Value |
 |-----------|-------|
-| **Version** | 6.19-latest |
+| **Version** | 7.1-latest |
 | **Scheduler** | BORE |
 | **Compiler** | GCC 15 |
 | **CPU Optimization** | x86-64-v4 |
@@ -32,8 +32,8 @@ git clone https://github.com/Frogging-Family/linux-tkg.git
 
 ```bash
 mkdir ~/.config/frogminer/ && cp linux-tkg.cfg ~/.config/frogminer/
-cp g14_6_19.config linux-tkg/ # copy config from repository to pulled tkg folder
-cp -r linux6.19-tkg-userpatches linux-tkg/ # copy patches from repository to pulled tkg folder
+cp g14_7_1.config linux-tkg/ # copy config from repository to pulled tkg folder
+cp -r linux71-tkg-userpatches linux-tkg/ # copy patches from repository to pulled tkg folder
 ```
 
 ### 3. Launch tkg install script
@@ -53,7 +53,3 @@ cd linux-tkg && sudo rm DEBS/*.deb
 git stash push -u && git pull --rebase origin master && git stash pop 0
 sudo ./install.sh install
 ```
-
-## Recommended GRUB Parameters
-
-see /etc/default/grub

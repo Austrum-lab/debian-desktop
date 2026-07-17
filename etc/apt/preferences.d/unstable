@@ -1,20 +1,31 @@
-# Excludes
-Package: *qt*
-Pin: release a=unstable
-Pin-Priority: 5
+# Excludes on top
+# qt packages
+#Package: *qt*
+#Pin: release a=unstable
+#Pin-Priority: 5
 
-# MESA stuff
-Package: *egl* *egl*:i386 *mesa* *mesa*:i386 *drm* *drm*:i386 *gbm* *gbm*:i386 *libwayland* *libwayland*:i386
+# Compositor and general DE stuff
+Package: *wayland* *wayland*:i386 *libinput* *libinput*:i386 *xdg-desktop-portal* *sddm*
 Pin: release a=unstable
 Pin-Priority: 500
 
-# DE, compositor and utilities to work with them
-Package: *gnome* *gsetting* *gtk* *mutter* *wayland* *nautilus* *gdm* *network-manager* *wayland*:i386 *totem* *gnome*:i386 *gsetting*:i386 *gtk*:i386 *mutter*:i386 *nautilus*:i386 *gdm*:i386 *network-manager*:i386
+# GPU (mostly MESA) stuff
+Package: *egl* *egl*:i386 *mesa* *mesa*:i386 *drm* *drm*:i386 *gbm* *gbm*:i386 *nvidia* *nvidia*:i386 *va* *va*:i386
+Pin: release a=unstable
+Pin-Priority: 500
+
+# Gnome DE, compositor and utilities to work with them
+Package: *gnome* *gsetting* *gtk* *mutter* *nautilus* *gdm* *network-manager* *totem*
+Pin: release a=unstable
+Pin-Priority: 500
+
+# KDE DE stuff
+Package: *plasma* *kwin* *konsole* *dolphin* *kate* *powerdevil* *bluedevil* *breeze* *kscreen* *kde* *kf* *systemsettings* *qml6* *kwallet* *quickcharts* *merkuro* *kirigami* *libtaskmanager* *libk* *libnotifi* *libbatterycontrol* *kactivitymanager* *libqal* *-sound* *libweather* *drkonqi* *kglobalaccel* *shell*qt* *knight* kgamma kinfocenter kmenuedit ksshaskpass ksystemstats kwrited
 Pin: release a=unstable
 Pin-Priority: 500
 
 # Sound stuff
-Package: *pipewire* *alsa* *wireplumber* *pipewire*:i386 *alsa*:i386 *wireplumber*:i386 *spa* *spa*:i386
+Package: *pipewire* *alsa* *wireplumber* *spa* *libcamera*
 Pin: release a=unstable
 Pin-Priority: 500
 
@@ -27,3 +38,4 @@ Pin-Priority: 500
 Package: *
 Pin: release a=unstable
 Pin-Priority: 5
+

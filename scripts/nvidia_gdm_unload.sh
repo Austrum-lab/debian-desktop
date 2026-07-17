@@ -16,6 +16,7 @@ fi
 echo "Stopping GDM and NVIDIA services..."
 
 systemctl stop gdm.service
+systemctl stop sddm.service
 systemctl stop nvidia-persistenced.service
 systemctl stop nvidia-powerd.service
 
