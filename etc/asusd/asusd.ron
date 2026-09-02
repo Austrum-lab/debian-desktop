@@ -14,6 +14,24 @@
     profile_custom_epp: Performance,
     profile_performance_epp: Performance,
     ac_profile_tunings: {
+        Quiet: (
+            enabled: true,
+            group: {
+                NvTempTarget: 87,
+                PptPl1Spl: 5,
+                PptPl3Fppt: 15,
+                PptPl2Sppt: 10,
+            },
+        ),
+        Performance: (
+            enabled: true,
+            group: {
+                NvTempTarget: 87,
+                PptPl1Spl: 30,
+                PptPl2Sppt: 55,
+                PptPl3Fppt: 70,
+            },
+        ),
         Balanced: (
             enabled: true,
             group: {
@@ -21,24 +39,6 @@
                 PptPl1Spl: 25,
                 NvTempTarget: 87,
                 PptPl3Fppt: 60,
-            },
-        ),
-        Quiet: (
-            enabled: true,
-            group: {
-                PptPl2Sppt: 10,
-                PptPl3Fppt: 15,
-                PptPl1Spl: 5,
-                NvTempTarget: 87,
-            },
-        ),
-        Performance: (
-            enabled: true,
-            group: {
-                NvTempTarget: 87,
-                PptPl2Sppt: 55,
-                PptPl3Fppt: 70,
-                PptPl1Spl: 30,
             },
         ),
     },

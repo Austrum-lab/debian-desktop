@@ -5,7 +5,7 @@
 #Pin-Priority: 5
 
 # Compositor and general DE stuff
-Package: *wayland* *wayland*:i386 *libinput* *libinput*:i386 *xdg-desktop-portal* *sddm*
+Package: *wayland* *wayland*:i386 *libinput* *libinput*:i386 *xdg-desktop-portal* *sddm* *qt*
 Pin: release a=unstable
 Pin-Priority: 500
 
@@ -15,12 +15,12 @@ Pin: release a=unstable
 Pin-Priority: 500
 
 # Gnome DE, compositor and utilities to work with them
-Package: *gnome* *gsetting* *gtk* *mutter* *nautilus* *gdm* *network-manager* *totem*
+Package: *gnome* *gsetting* *gtk* *mutter* *nautilus* *gdm* *network-manager* *totem* *eog*
 Pin: release a=unstable
 Pin-Priority: 500
 
 # KDE DE stuff
-Package: *plasma* *kwin* *konsole* *dolphin* *kate* *powerdevil* *bluedevil* *breeze* *kscreen* *kde* *kf* *systemsettings* *qml6* *kwallet* *quickcharts* *merkuro* *kirigami* *libtaskmanager* *libk* *libnotifi* *libbatterycontrol* *kactivitymanager* *libqal* *-sound* *libweather* *drkonqi* *kglobalaccel* *shell*qt* *knight* kgamma kinfocenter kmenuedit ksshaskpass ksystemstats kwrited
+Package: *plasma* *kwin* *konsole* *dolphin* *kate* *powerdevil* *bluedevil* *breeze* *kscreen* *kde* *kf* *systemsettings* *qml6* *kwallet* *quickcharts* *merkuro* *kirigami* *libtaskmanager* *libk* *libnotifi* *libbatterycontrol* *kactivitymanager* *libqal* *-sound* *libweather* *drkonqi* *kglobalaccel* *shell*qt* *knight* kgamma kinfocenter kmenuedit ksshaskpass ksystemstats kwrited *akonadi* *kpim* *kalendarac*
 Pin: release a=unstable
 Pin-Priority: 500
 
